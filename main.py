@@ -7,6 +7,8 @@ import asyncio
 import logging
 from dispatcher.dispatcher import dis, bot
 from aiobot.database import db
+import threading
+import os
 
 logging.basicConfig(level=logging.INFO)
 
@@ -22,6 +24,16 @@ load_dotenv()
 #                 os.environ[key] = value.strip('"').strip("'")
 # except FileNotFoundError:
 #     pass
+def run_fake_server():
+    import http.server
+    import socketserver
+
+    port = int(os.environ.get("PORT", 8080))
+    Handler = http.server.SimpleHTTPRequestHandler
+    with socketserver.TCPServer(("", port), Handler) as httpd:
+        print(f"Serving fake HTTP on port {port}")
+        httpd.serve_forever()
+
 
 dis.include_router(commands.router)
 dis.include_router(ad.router)
