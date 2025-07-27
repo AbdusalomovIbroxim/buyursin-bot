@@ -9,6 +9,7 @@ from dispatcher.dispatcher import dis, bot
 from aiobot.database import db
 import threading
 import os
+from datetime import datetime
 
 logging.basicConfig(level=logging.INFO)
 
@@ -24,6 +25,7 @@ load_dotenv()
 #                 os.environ[key] = value.strip('"').strip("'")
 # except FileNotFoundError:
 #     pass
+
 def run_fake_server():
     import http.server
     import socketserver
@@ -33,6 +35,22 @@ def run_fake_server():
     with socketserver.TCPServer(("", port), Handler) as httpd:
         print(f"Serving fake HTTP on port {port}")
         httpd.serve_forever()
+
+# Функция для поддержания активности бота
+async def keep_alive():
+    """Отправляет сообщение каждую минуту для поддержания активности"""
+    admin_id = 1501361138  # Ваш ID в Telegram
+    while True:
+        try:
+            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            message = f"🤖 Бот активен! Время: {current_time}\n✅ Все системы работают нормально"
+            await bot.send_message(admin_id, message)
+            print(f"[KEEP_ALIVE] Сообщение отправлено в {current_time}")
+        except Exception as e:
+            print(f"[KEEP_ALIVE] Ошибка отправки: {e}")
+        
+        # Ждем 60 секунд (1 минуту)
+        await asyncio.sleep(60)
 
 
 dis.include_router(commands.router)
@@ -49,6 +67,13 @@ async def on_startup():
 
 async def main():
     await on_startup()
+    
+    # Запускаем фейковый HTTP сервер в отдельном потоке
+    threading.Thread(target=run_fake_server, daemon=True).start()
+    
+    # Запускаем функцию поддержания активности
+    asyncio.create_task(keep_alive())
+    
     # Для высокой нагрузки используйте webhook (см. комментарии ниже)
     # await dis.start_webhook(
     #     bot,
