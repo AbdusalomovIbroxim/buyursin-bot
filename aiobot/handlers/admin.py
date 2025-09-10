@@ -62,7 +62,7 @@ async def approve_ad(call: CallbackQuery):
         f"состояние: <b>{condition}</b>\n"
         f"цена: <b>{price}</b>\n"
         f"размер: <b>{size}</b>\n"
-        f"Телефон: <b>+{phone}</b>"
+        # f"Телефон: <b>+{phone}</b>"
     )
     photos_str = ad.photos
     photos = photos_str.split(",") if photos_str else []
