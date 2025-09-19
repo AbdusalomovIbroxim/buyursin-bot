@@ -13,9 +13,9 @@ TEXTS = {
         "ru": "🇷🇺 Русский", "uz": "🇺🇿 O‘zbekcha", "en": "🇬🇧 English"
     },
     "ad_title": {
-        "ru": "Введите заголовок объявления:",
-        "uz": "E'lon sarlavhasini kiriting:",
-        "en": "Enter the ad title:"
+        "ru": "Введите название и краткое описание товара (например: «Куртка Zara, мужская, чёрная, в хорошем состоянии»). Укажите бренд, цвет и особенности вещи — так её быстрее купят.",
+        "uz": "Mahsulot nomi va qisqa tavsifini kiriting (masalan: «Zara kurtkasi, erkaklar uchun, qora rang, yaxshi holatda»). Brend, rang va xususiyatlarini yozing — shunda tezroq sotiladi.",
+        "en": "Enter the product name and a short description (e.g., “Zara jacket, men’s, black, in good condition”). Mention the brand, color, and features — it will help sell faster."
     },
     "ad_price": {
         "ru": "Введите цену:",
@@ -75,4 +75,20 @@ TEXTS = {
         "ru": "Регистрация прошла успешно!",
         "uz": "Ro'yxatdan o'tish muvaffaqiyatli yakunlandi!"
     },
+    "ad_size_category": {
+        "ru": "Выберите категорию товара:\n\n👕 Одежда\n👟 Обувь\n👜 Аксессуары",
+        "uz": "Mahsulot turini tanlang:\n\n👕 Kiyim\n👟 Oyoq kiyim\n👜 Aksessuarlar",
+        "en": "Choose a category:\n\n👕 Clothing\n👟 Shoes\n👜 Accessories"
+    },
+    "ad_size_clothing": {
+        "ru": "Выберите размер одежды или введите свой:",
+        "uz": "Kiyim o'lchamini tanlang yoki o'zingiz yozing:",
+        "en": "Select clothing size or enter your own:"
+    },
+    "ad_size_shoes": {
+        "ru": "Выберите размер обуви или введите свой:",
+        "uz": "Oyoq kiyim o'lchamini tanlang yoki o'zingiz yozing:",
+        "en": "Select shoe size or enter your own:"
+    },
+
 } 

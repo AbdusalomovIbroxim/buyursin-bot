@@ -30,15 +30,35 @@ def phone_keyboard(lang):
         resize_keyboard=True
     )
 
-# Клавиатура размеров
 
-def size_keyboard():
-    size_buttons = [
-        [KeyboardButton(text="XS (42)"), KeyboardButton(text="S (44)"), KeyboardButton(text="M (46-48)")],
-        [KeyboardButton(text="L (50-52)"), KeyboardButton(text="XL (54-56)")],
-        [KeyboardButton(text="XXL (58-60)"), KeyboardButton(text="XXXL (62-64)")]
+# Клавиатура выбора категории размеров
+def size_category_keyboard():
+    buttons = [
+        [KeyboardButton(text="👕 Одежда")],
+        [KeyboardButton(text="👟 Обувь")],
+        [KeyboardButton(text="👜 Аксессуары")]
     ]
-    return ReplyKeyboardMarkup(keyboard=size_buttons, resize_keyboard=True)
+    return ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
+
+# Клавиатура размеров одежды
+def clothing_size_keyboard():
+    buttons = [
+        [KeyboardButton(text="XS (42)"), KeyboardButton(text="S (44)")],
+        [KeyboardButton(text="M (46-48)"), KeyboardButton(text="L (50-52)")],
+        [KeyboardButton(text="XL (54-56)"), KeyboardButton(text="XXL (58-60)")],
+        [KeyboardButton(text="XXXL (62-64)"), KeyboardButton(text="Другое")]
+    ]
+    return ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
+
+# Клавиатура размеров обуви
+def shoes_size_keyboard():
+    buttons = [
+        [KeyboardButton(text="36"), KeyboardButton(text="37"), KeyboardButton(text="38")],
+        [KeyboardButton(text="39"), KeyboardButton(text="40"), KeyboardButton(text="41")],
+        [KeyboardButton(text="42"), KeyboardButton(text="43"), KeyboardButton(text="44")],
+        [KeyboardButton(text="45"), KeyboardButton(text="46"), KeyboardButton(text="Другое")]
+    ]
+    return ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
 
 # Клавиатура состояния
 

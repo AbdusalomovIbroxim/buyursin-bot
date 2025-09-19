@@ -3,7 +3,7 @@ from aiogram import Router, F
 from aiogram.types import Message, InputMediaPhoto
 from aiogram.fsm.context import FSMContext
 from aiobot.states import AdForm
-from aiobot.buttons.keyboards.reply import size_keyboard, condition_keyboard, confirm_keyboard, main_keyboard, photos_keyboard
+from aiobot.buttons.keyboards.reply import condition_keyboard, confirm_keyboard, main_keyboard, photos_keyboard, size_category_keyboard, clothing_size_keyboard, shoes_size_keyboard
 from aiobot.buttons.keyboards.inline import admin_inline_keyboard
 from aiobot.texts import TEXTS
 from aiobot.models.users import Users
@@ -35,7 +35,7 @@ async def ad_title(message: Message, state: FSMContext):
         logging.error(f"ad_title error: {e}")
         await message.answer(f"Ошибка: {e}")
 
-
+    
 # 2. Получение цены
 @router.message(AdForm.price)
 async def ad_price(message: Message, state: FSMContext):
@@ -43,24 +43,54 @@ async def ad_price(message: Message, state: FSMContext):
     logging.info(f"ad_price: user_id={message.from_user.id}, text={message.text}")
     await state.update_data(price=message.text)
     lang = await Users.get_language(message.from_user.id)
-    await state.set_state(AdForm.size)
-    await message.answer(TEXTS["ad_size"][lang], reply_markup=size_keyboard())
-    print(f"ad_price: sent size request to user_id={message.from_user.id}")
-    logging.info(f"ad_price: sent size request to user_id={message.from_user.id}")
 
-# 3. Получение размера через кнопки (обновлённые варианты)
-@router.message(AdForm.size, F.text.in_([
-    "XS (42)", "S (44)", "M (46-48)", "L (50-52)", "XL (54-56)", "XXL (58-60)", "XXXL (62-64)"
-]))
+    # 👉 сначала спрашиваем категорию размеров
+    await state.set_state(AdForm.size_category)
+    await message.answer(TEXTS["ad_size_category"][lang], reply_markup=size_category_keyboard())
+
+    print(f"ad_price: sent size_category request to user_id={message.from_user.id}")
+    logging.info(f"ad_price: sent size_category request to user_id={message.from_user.id}")
+
+
+# 2.1. Получение категории размера
+@router.message(AdForm.size_category, F.text.in_(["👕 Одежда", "👟 Обувь", "👜 Аксессуары"]))
+async def ad_size_category(message: Message, state: FSMContext):
+    print(f"ad_size_category: user_id={message.from_user.id}, text={message.text}")
+    logging.info(f"ad_size_category: user_id={message.from_user.id}, text={message.text}")
+
+    category = message.text
+    await state.update_data(size_category=category)
+    lang = await Users.get_language(message.from_user.id)
+
+    if category == "👕 Одежда":
+        await state.set_state(AdForm.size)
+        await message.answer(TEXTS["ad_size_clothing"][lang], reply_markup=clothing_size_keyboard())
+    elif category == "👟 Обувь":
+        await state.set_state(AdForm.size)
+        await message.answer(TEXTS["ad_size_shoes"][lang], reply_markup=shoes_size_keyboard())
+    else:  # 👜 Аксессуары
+        await state.update_data(size="Без размера")
+        await state.set_state(AdForm.condition)
+        await message.answer(TEXTS["ad_condition"][lang], reply_markup=condition_keyboard())
+
+
+# 3. Получение размера (с кнопками и вводом вручную)
+@router.message(AdForm.size)
 async def ad_size(message: Message, state: FSMContext):
     print(f"ad_size: user_id={message.from_user.id}, text={message.text}")
     logging.info(f"ad_size: user_id={message.from_user.id}, text={message.text}")
-    await state.update_data(size=message.text)
+
+    size_value = message.text.strip()  # можно выбрать из кнопок или ввести свой
+    await state.update_data(size=size_value)
+
     lang = await Users.get_language(message.from_user.id)
     await state.set_state(AdForm.condition)
     await message.answer(TEXTS["ad_condition"][lang], reply_markup=condition_keyboard())
+
     print(f"ad_size: sent condition request to user_id={message.from_user.id}")
     logging.info(f"ad_size: sent condition request to user_id={message.from_user.id}")
+
+
 
 # 4. Получение состояния через кнопки (без 'Другое')
 @router.message(AdForm.condition, F.text.in_(["Новый", "Почти новый", "Хорошее", "Среднее", "Требует ремонта"]))

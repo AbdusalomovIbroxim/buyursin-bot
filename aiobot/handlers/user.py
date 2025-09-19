@@ -14,16 +14,26 @@ LANGS = {"🇷🇺 Русский": "ru", "🇺🇿 O‘zbekcha": "uz", "🇬�
 
 @router.message(Command("start"))
 async def cmd_start(message: Message, state: FSMContext):
-    await state.clear()  # Сброс состояния и данных при /start
+    # Всегда сбрасываем состояние и данные
+    await state.clear()
     print(f"cmd_start: user_id={message.from_user.id}, text={message.text}")
     logging.info(f"cmd_start: user_id={message.from_user.id}, text={message.text}")
+
     user = await Users.get(message.from_user.id)
     if user:
         lang = user.lang or "ru"
-        await message.answer(TEXTS["start_desc"][lang], reply_markup=main_keyboard(lang))
+        await message.answer(
+            TEXTS["start_desc"][lang],
+            reply_markup=main_keyboard(lang)
+        )
     else:
-        await message.answer(TEXTS["welcome"]["ru"], reply_markup=lang_keyboard())
+        await message.answer(
+            TEXTS["welcome"]["ru"],
+            reply_markup=lang_keyboard()
+        )
+        # ставим первое состояние регистрации (например, выбор языка)
         await state.set_state("register_language")
+
 
 @router.message(StateFilter("register_language"), F.text.in_(LANGS.keys()))
 async def register_choose_lang(message: Message, state: FSMContext):
