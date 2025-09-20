@@ -31,8 +31,8 @@ def check_single_instance():
 
 
 dis.include_router(commands.router)
-dis.include_router(ad.router)
 dis.include_router(user.router)
+dis.include_router(ad.router)
 dis.include_router(admin.router)
 
 
