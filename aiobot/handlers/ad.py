@@ -4,7 +4,7 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command
 
-from aiobot.buttons.keyboards.reply import main_keyboard, lang_keyboard, size_category_keyboard, clothing_size_keyboard, photos_keyboard
+from aiobot.buttons.keyboards.reply import main_keyboard, lang_keyboard, size_category_keyboard, clothing_size_keyboard, photos_keyboard, condition_keyboard
 from aiobot.models import Ads, Users
 from aiobot.texts import TEXTS
 from aiobot.states import AdForm, Register
@@ -137,7 +137,7 @@ async def ad_size_category(message: Message, state: FSMContext):
 async def ad_size(message: Message, state: FSMContext):
     await state.update_data(size=message.text)
     user = await Users.get(user_id=message.from_user.id)
-    await message.answer(TEXTS["ad_condition"][user.lang])
+    await message.answer(TEXTS["ad_condition"][user.lang], reply_markup=condition_keyboard())
     await state.set_state(AdForm.condition)
 
 
