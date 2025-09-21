@@ -214,6 +214,7 @@ async def photos_done(message: Message, state: FSMContext):
     lang = user.lang
     done_text = TEXTS["photos_done"].get(lang, TEXTS["photos_done"]["ru"])
     data = await state.get_data()
+
     photos = data.get("photos", [])
 
     # Проверяем, нажал ли юзер кнопку "Готово"
@@ -256,7 +257,7 @@ async def photos_done(message: Message, state: FSMContext):
         await state.set_state(AdForm.confirm)
         
 
-@router.message(AdForm.confirm, lambda c: c.data and c.data.startswith("user_confirm_"))
+@router.callback_query(lambda c: c.data and c.data.startswith("user_confirm_"))
 async def ad_confirm(query: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     user = await Users.get(user_id=query)
