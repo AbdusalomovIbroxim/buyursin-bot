@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, update, delete
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, update, delete, BigInteger
 from sqlalchemy.future import select
 
 from aiobot.database import Base, db
