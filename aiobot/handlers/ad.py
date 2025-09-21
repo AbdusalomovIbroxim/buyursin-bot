@@ -287,11 +287,11 @@ async def ad_confirm(message: Message, state: FSMContext):
             for i, file_id in enumerate(data["photos"]):
                 if i == 0:
                     # Первое фото + текст
-                    media.append({"type": "photo", "media": file_id, "caption": ad_text})
+                    media.append({"type": "photo", "media": file_id, "caption": ad_text, "parse_mode": "HTML"})
                 else:
                     media.append({"type": "photo", "media": file_id})
 
-            await bot.send_media_group(chat_id=ADMIN_GROUP_ID, media=media, parse_mode="HTML")
+            await bot.send_media_group(chat_id=ADMIN_GROUP_ID, media=media)
         else:
             await bot.send_message(chat_id=ADMIN_GROUP_ID, text=ad_text, parse_mode="HTML")
 
