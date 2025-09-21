@@ -44,14 +44,12 @@ async def on_startup():
 
 async def main():
     if not check_single_instance():
-        print("[ERROR] Завершение работы бота")
         sys.exit(1)
     
     await on_startup()
     
     # threading.Thread(target=run_fake_server, daemon=True).start()
 
-    print("[INFO] Bot started in polling mode (for dev/testing)")
     await dis.start_polling(bot)
 
 

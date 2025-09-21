@@ -7,7 +7,7 @@ from aiobot.models.users import Users
 from aiogram.filters import Command, StateFilter
 import logging
 
-from states import Register
+from aiobot.states import Register
 
 router = Router()
 
