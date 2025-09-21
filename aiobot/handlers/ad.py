@@ -280,6 +280,7 @@ async def ad_confirm(message: Message, state: FSMContext):
             f"📏 {TEXTS['field_size'][lang]}: {data['size']}\n"
             f"⚡ {TEXTS['field_condition'][lang]}: {data['condition']}\n"
             f"👤 Пользователь: {hlink(message.from_user.full_name, f'tg://user?id={message.from_user.id}')}"
+            f"📞: {user.phone_number}\n"
         )
 
         if data.get("photos"):
