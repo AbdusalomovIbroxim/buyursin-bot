@@ -42,7 +42,14 @@ async def my_ads(message: Message):
 
 
 # 📢 Добавить объявление
-@router.message(Command("add_ad"))
+# @router.message(Command("add_ad"))
+@router.message(
+    F.text.in_([
+        TEXTS["add_ad"]["ru"],
+        TEXTS["add_ad"]["uz"],
+        TEXTS["add_ad"]["en"]
+    ])
+)
 async def add_ad(message: Message, state: FSMContext):
     user = await Users.get_or_none(user_id=message.from_user.id)
     if not user:
