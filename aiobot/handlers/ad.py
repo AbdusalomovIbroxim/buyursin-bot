@@ -275,10 +275,10 @@ async def ad_confirm(message: Message, state: FSMContext):
         # Отправка в группу модерации
         ad_text = (
             f"📝 Новое объявление #{ad.pk}\n\n"
-            f"📌 {data['title']}\n"
-            f"💰 {data['price']} UZS\n"
-            f"📏 {data['size']}\n"
-            f"⚡ {data['condition']}\n\n"
+            f"📌 {TEXTS['field_title'][lang]}: {data['title']}\n"
+            f"💰 {TEXTS['field_price'][lang]}: {data['price']} UZS\n"
+            f"📏 {TEXTS['field_size'][lang]}: {data['size']}\n"
+            f"⚡ {TEXTS['field_condition'][lang]}: {data['condition']}\n"
             f"👤 Пользователь: {hlink(message.from_user.full_name, f'tg://user?id={message.from_user.id}')}"
         )
 
@@ -291,9 +291,9 @@ async def ad_confirm(message: Message, state: FSMContext):
                 else:
                     media.append({"type": "photo", "media": file_id})
 
-            await bot.send_media_group(chat_id=ADMIN_GROUP_ID, media=media)
+            await bot.send_media_group(chat_id=ADMIN_GROUP_ID, media=media, parse_mode="HTML")
         else:
-            await bot.send_message(chat_id=ADMIN_GROUP_ID, text=ad_text)
+            await bot.send_message(chat_id=ADMIN_GROUP_ID, text=ad_text, parse_mode="HTML")
 
         await state.clear()
         return
