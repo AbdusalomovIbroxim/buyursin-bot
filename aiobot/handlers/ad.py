@@ -213,6 +213,7 @@ async def photos_done(message: Message, state: FSMContext):
     user = await Users.get(user_id=message.from_user.id)
     lang = user.lang
     done_text = TEXTS["photos_done"].get(lang, TEXTS["photos_done"]["ru"])
+    data = await state.get_data()
     photos = data.get("photos", [])
 
     # Проверяем, нажал ли юзер кнопку "Готово"
@@ -221,7 +222,6 @@ async def photos_done(message: Message, state: FSMContext):
             await message.answer("❌ Нужно добавить хотя бы одно фото.")
             return
 
-        data = await state.get_data()
 
         # Текст объявления
         ad_text = (
