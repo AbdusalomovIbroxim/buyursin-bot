@@ -4,9 +4,9 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command
 
-from buttons.keyboards.reply import main_keyboard
-from models import Ads, Users
-from texts import TEXTS
+from aiobot.buttons.keyboards.reply import main_keyboard
+from aiobot.models import Ads, Users
+from aiobot.texts import TEXTS
 from aiobot.states import AdForm
 
 router = Router()
