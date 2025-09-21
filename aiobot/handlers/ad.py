@@ -137,7 +137,7 @@ async def ad_size_category(message: Message, state: FSMContext):
 async def ad_size(message: Message, state: FSMContext):
     await state.update_data(size=message.text)
     user = await Users.get(user_id=message.from_user.id)
-    await message.answer(TEXTS["ad_condition"][user.lang], reply_markup=condition_keyboard())
+    await message.answer(TEXTS["ad_condition"][user.lang], reply_markup=condition_keyboard(user.lang))
     await state.set_state(AdForm.condition)
 
 
