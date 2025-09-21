@@ -4,6 +4,7 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command
 from aiogram.types import InputMediaPhoto
+from aiogram.utils.markdown import hlink
 from aiobot.buttons.keyboards.reply import main_keyboard, lang_keyboard, size_category_keyboard, clothing_size_keyboard, photos_keyboard, condition_keyboard
 from aiobot.models import Ads, Users
 from aiobot.texts import TEXTS
@@ -278,7 +279,7 @@ async def ad_confirm(message: Message, state: FSMContext):
             f"💰 {data['price']} UZS\n"
             f"📏 {data['size']}\n"
             f"⚡ {data['condition']}\n\n"
-            f"👤 Пользователь: {message.from_user.mention}"
+            f"👤 Пользователь: {hlink(message.from_user.full_name, f'tg://user?id={message.from_user.id}')}"
         )
 
         if data.get("photos"):
@@ -299,30 +300,3 @@ async def ad_confirm(message: Message, state: FSMContext):
 
     # Если что-то другое
     await message.answer(TEXTS["ad_confirm_repeat"][lang])
-
-
-# ✏️ Редактирование объявления
-# @router.message(Command("edit_ad"))
-# async def edit_ad(message: Message, state: FSMContext):
-#     user = await Users.get(user_id=message.from_user.id)
-#     if not user:
-#         await message.answer("❌ Not registered")
-#         return
-
-#     ads = await Ads.filter(user=user)
-#     if not ads:
-#         await message.answer({
-#             "ru": "У вас нет объявлений для редактирования.",
-#             "uz": "Sizda tahrirlash uchun e'lonlar yo'q.",
-#             "en": "You have no ads to edit."
-#         }[user.lang])
-#         return
-
-#     text = {
-#         "ru": "Выберите ID объявления для редактирования:",
-#         "uz": "Tahrirlash uchun e'lon ID sini tanlang:",
-#         "en": "Choose an ad ID to edit:"
-#     }[user.lang]
-
-#     reply = "\n".join([f"{ad.id}: {ad.title}" for ad in ads])
-#     await message.answer(f"{text}\n\n{reply}")
