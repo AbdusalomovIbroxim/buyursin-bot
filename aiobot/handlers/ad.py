@@ -117,15 +117,22 @@ async def ad_price(message: Message, state: FSMContext):
     amount = int(match.group(1))
     suffix = match.group(2)
 
-    # # Обработка сокращений
-    # if suffix in ("k", "к"):   # 100k → 100000
-    #     price = amount * 1000
-    # elif suffix == "$":        # 200$ → переводим в сумы (например, * 12500)
-    #     price = amount * 12500
-    # else:                      # som / sum / ничего → считаем как есть
-    price = amount
+    # Обработка сокращений
+    if suffix in ("k", "к"):   # 100k → 100000
+        price = amount * 1000
+    else:                       # som / sum / $ / ничего → считаем как есть
+        price = amount
 
-    # Лимит
+    # Проверка минимальной суммы
+    if price < 100:
+        await message.answer({
+            "ru": "❌ Слишком низкая цена. Введите сумму не меньше 100 сум.",
+            "uz": "❌ Juda past narx. 100 sumdan kam bo‘lmagan summani kiriting.",
+            "en": "❌ Price too low. Enter at least 100 UZS."
+        }[lang])
+        return
+
+    # Лимит максимума
     if price > 10_000_000:
         await message.answer({
             "ru": "❌ Слишком высокая цена. Введите сумму меньше 10 млн.",
