@@ -260,7 +260,7 @@ async def photos_done(message: Message, state: FSMContext):
 @router.callback_query(lambda c: c.data and c.data.startswith("user_confirm_"))
 async def ad_confirm(query: CallbackQuery, state: FSMContext):
     data = await state.get_data()
-    user = await Users.get(user_id=query)
+    user = await Users.get(user_id=query.from_user.id)
     lang = user.lang
 
     if query.data == "user_confirm_no":
