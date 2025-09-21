@@ -1,16 +1,17 @@
+import asyncio
 import logging
 from aiogram import Router, F
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command
-
+from aiogram.types import InputMediaPhoto
 from aiobot.buttons.keyboards.reply import main_keyboard, lang_keyboard, size_category_keyboard, clothing_size_keyboard, photos_keyboard, condition_keyboard
 from aiobot.models import Ads, Users
 from aiobot.texts import TEXTS
 from aiobot.states import AdForm, Register
 
 router = Router()
-
+media_groups_cache = {}
 
 
 # 📢 Мои объявления
@@ -154,18 +155,44 @@ async def ad_photos(message: Message, state: FSMContext):
     data = await state.get_data()
     photos = data.get("photos", [])
 
-    if len(photos) >= 10:
-        await message.answer("❌ Нельзя добавить больше 10 фотографий.")
-        return
+    # Если сообщение часть альбома
+    if message.media_group_id:
+        group_id = message.media_group_id
 
-    photos.append(message.photo[-1].file_id)
-    await state.update_data(photos=photos)
+        # добавляем фото во временный кэш
+        if group_id not in media_groups_cache:
+            media_groups_cache[group_id] = []
 
-    await message.answer(
-        f"Фото сохранено ✅ ({len(photos)}/{10}). "
-        f"Отправьте ещё или нажмите 'Готово'."
-    )
+        media_groups_cache[group_id].append(message.photo[-1].file_id)
 
+        # ждём немного, пока придут все фото альбома
+        await asyncio.sleep(0.5)
+
+        # обрабатываем только один раз, когда альбом уже собран
+        if group_id in media_groups_cache:
+            new_photos = media_groups_cache.pop(group_id)
+            for p in new_photos:
+                if len(photos) < 10:
+                    photos.append(p)
+
+            await state.update_data(photos=photos)
+            await message.answer(
+                f"Фотографии сохранены ✅ ({len(photos)}/{10}). "
+                f"Отправьте ещё или нажмите 'Готово'."
+            )
+    else:
+        # одиночная фотография
+        if len(photos) >= 10:
+            await message.answer("❌ Нельзя добавить больше 10 фотографий.")
+            return
+
+        photos.append(message.photo[-1].file_id)
+        await state.update_data(photos=photos)
+
+        await message.answer(
+            f"Фото сохранено ✅ ({len(photos)}/{10}). "
+            f"Отправьте ещё или нажмите 'Готово'."
+        )
 
 @router.message(AdForm.confirm, F.text.lower() == "да")
 async def ad_confirm(message: Message, state: FSMContext):
