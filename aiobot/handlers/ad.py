@@ -27,33 +27,33 @@ def is_no(text: str) -> bool:
     return text.lower() in CONFIRM_WORDS["no"]
 
 # 📢 Мои объявления
-@router.message(Command("my_ads"))
-async def my_ads(message: Message, state: FSMContext):
+# @router.message(Command("my_ads"))
+# async def my_ads(message: Message, state: FSMContext):
     
-    user = await Users.get(user_id=message.from_user.id)
-    if not user:
-        await message.answer(TEXTS["welcome"]["ru"], reply_markup=lang_keyboard())
-        await state.set_state(Register.language)
-        return
+#     user = await Users.get(user_id=message.from_user.id)
+#     if not user:
+#         await message.answer(TEXTS["welcome"]["ru"], reply_markup=lang_keyboard())
+#         await state.set_state(Register.language)
+#         return
 
-    ads = await Ads.filter(user=user)
-    if not ads:
-        await message.answer({
-            "ru": "У вас пока нет объявлений.",
-            "uz": "Sizda hali e'lonlar yo'q.",
-            "en": "You don’t have any ads yet."
-        }[user.lang])
-        return
+#     ads = await Ads.filter(user=user)
+#     if not ads:
+#         await message.answer({
+#             "ru": "У вас пока нет объявлений.",
+#             "uz": "Sizda hali e'lonlar yo'q.",
+#             "en": "You don’t have any ads yet."
+#         }[user.lang])
+#         return
 
-    text = {
-        "ru": "📋 Ваши объявления:\n\n",
-        "uz": "📋 Sizning e'lonlaringiz:\n\n",
-        "en": "📋 Your ads:\n\n"
-    }[user.lang]
+#     text = {
+#         "ru": "📋 Ваши объявления:\n\n",
+#         "uz": "📋 Sizning e'lonlaringiz:\n\n",
+#         "en": "📋 Your ads:\n\n"
+#     }[user.lang]
 
-    for ad in ads:
-        text += f"• {ad.title} — {ad.price} UZS\n"
-    await message.answer(text, reply_markup=main_keyboard(user.lang))
+#     for ad in ads:
+#         text += f"• {ad.title} — {ad.price} UZS\n"
+#     await message.answer(text, reply_markup=main_keyboard(user.lang))
 
 
 # 📢 Добавить объявление
