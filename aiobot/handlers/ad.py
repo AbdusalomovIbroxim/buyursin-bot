@@ -209,10 +209,10 @@ async def photos_done(message: Message, state: FSMContext):
         # Текст объявления
         ad_text = (
             f"{TEXTS['ad_confirm'][lang]}\n\n"
-            f"📌 {data['title']}\n"
-            f"💰 {data['price']} UZS\n"
-            f"📏 {data['size']}\n"
-            f"⚡ {data['condition']}\n"
+            f"📌 <b>{TEXTS['field_title'][lang]}:</b> {data['title']}\n"
+            f"💰 <b>{TEXTS['field_price'][lang]}:</b> {data['price']} UZS\n"
+            f"📏 <b>{TEXTS['field_size'][lang]}:</b> {data['size']}\n"
+            f"⚡ <b>{TEXTS['field_condition'][lang]}:</b> {data['condition']}\n"
         )
 
         # Если есть несколько фото — отправляем альбом

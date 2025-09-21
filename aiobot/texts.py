@@ -141,5 +141,30 @@ TEXTS = {
         "ru": "✅ Готово",
         "uz": "✅ Tayyor",
         "en": "✅ Done"
-    }
+    },
+    "field_title": {
+        "ru": "Название",
+        "uz": "Nomi",
+        "en": "Title"
+    },
+    "field_price": {
+        "ru": "Цена",
+        "uz": "Narx",
+        "en": "Price"
+    },
+    "field_size": {
+        "ru": "Размер",
+        "uz": "O‘lcham",
+        "en": "Size"
+    },
+    "field_condition": {
+        "ru": "Состояние",
+        "uz": "Holati",
+        "en": "Condition"
+    },
+    "field_photos": {
+        "ru": "Фотографии",
+        "uz": "Rasmlar",
+        "en": "Photos"
+    },
 } 
