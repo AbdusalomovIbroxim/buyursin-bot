@@ -273,7 +273,7 @@ async def ad_confirm(message: Message, state: FSMContext):
 
         # Отправка в группу модерации
         ad_text = (
-            f"📝 Новое объявление #{ad.id}\n\n"
+            f"📝 Новое объявление #{ad.pk}\n\n"
             f"📌 {data['title']}\n"
             f"💰 {data['price']} UZS\n"
             f"📏 {data['size']}\n"
