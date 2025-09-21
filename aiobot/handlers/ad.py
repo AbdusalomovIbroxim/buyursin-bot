@@ -4,10 +4,10 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command
 
-from aiobot.buttons.keyboards.reply import main_keyboard
+from aiobot.buttons.keyboards.reply import main_keyboard, lang_keyboard
 from aiobot.models import Ads, Users
 from aiobot.texts import TEXTS
-from aiobot.states import AdForm
+from aiobot.states import AdForm, Register
 
 router = Router()
 
@@ -15,10 +15,12 @@ router = Router()
 
 # 📢 Мои объявления
 @router.message(Command("my_ads"))
-async def my_ads(message: Message):
-    user = await Users.get_or_none(user_id=message.from_user.id)
+async def my_ads(message: Message, state: FSMContext):
+    
+    user = await Users.get(user_id=message.from_user.id)
     if not user:
-        await message.answer(TEXTS["reg_success"]["ru"])  # fallback
+        await message.answer(TEXTS["welcome"]["ru"], reply_markup=lang_keyboard())
+        await state.set_state(Register.language)
         return
 
     ads = await Ads.filter(user=user)
@@ -51,9 +53,10 @@ async def my_ads(message: Message):
     ])
 )
 async def add_ad(message: Message, state: FSMContext):
-    user = await Users.get_or_none(user_id=message.from_user.id)
+    user = await Users.get(user_id=message.from_user.id)
     if not user:
-        await message.answer("❌ Not registered")
+        await message.answer(TEXTS["welcome"]["ru"], reply_markup=lang_keyboard())
+        await state.set_state(Register.language)
         return
 
     await message.answer(TEXTS["ad_title"][user.lang])
@@ -181,27 +184,27 @@ async def ad_confirm(message: Message, state: FSMContext):
 
 
 # ✏️ Редактирование объявления
-@router.message(Command("edit_ad"))
-async def edit_ad(message: Message, state: FSMContext):
-    user = await Users.get_or_none(user_id=message.from_user.id)
-    if not user:
-        await message.answer("❌ Not registered")
-        return
+# @router.message(Command("edit_ad"))
+# async def edit_ad(message: Message, state: FSMContext):
+#     user = await Users.get(user_id=message.from_user.id)
+#     if not user:
+#         await message.answer("❌ Not registered")
+#         return
 
-    ads = await Ads.filter(user=user)
-    if not ads:
-        await message.answer({
-            "ru": "У вас нет объявлений для редактирования.",
-            "uz": "Sizda tahrirlash uchun e'lonlar yo'q.",
-            "en": "You have no ads to edit."
-        }[user.lang])
-        return
+#     ads = await Ads.filter(user=user)
+#     if not ads:
+#         await message.answer({
+#             "ru": "У вас нет объявлений для редактирования.",
+#             "uz": "Sizda tahrirlash uchun e'lonlar yo'q.",
+#             "en": "You have no ads to edit."
+#         }[user.lang])
+#         return
 
-    text = {
-        "ru": "Выберите ID объявления для редактирования:",
-        "uz": "Tahrirlash uchun e'lon ID sini tanlang:",
-        "en": "Choose an ad ID to edit:"
-    }[user.lang]
+#     text = {
+#         "ru": "Выберите ID объявления для редактирования:",
+#         "uz": "Tahrirlash uchun e'lon ID sini tanlang:",
+#         "en": "Choose an ad ID to edit:"
+#     }[user.lang]
 
-    reply = "\n".join([f"{ad.id}: {ad.title}" for ad in ads])
-    await message.answer(f"{text}\n\n{reply}")
+#     reply = "\n".join([f"{ad.id}: {ad.title}" for ad in ads])
+#     await message.answer(f"{text}\n\n{reply}")
