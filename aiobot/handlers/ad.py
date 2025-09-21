@@ -1,5 +1,4 @@
 import asyncio
-import logging
 from aiogram import Router, F
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
@@ -9,10 +8,22 @@ from aiobot.buttons.keyboards.reply import main_keyboard, lang_keyboard, size_ca
 from aiobot.models import Ads, Users
 from aiobot.texts import TEXTS
 from aiobot.states import AdForm, Register
+from config import ADMIN_GROUP_ID
+from dispatcher.dispatcher import bot
 
 router = Router()
 media_groups_cache = {}
 
+CONFIRM_WORDS = {
+    "yes": ["да", "ha", "yes", "xa"],
+    "no": ["нет", "yo‘q", "yoq", "no", "yo'q"]
+}
+
+def is_yes(text: str) -> bool:
+    return text.lower() in CONFIRM_WORDS["yes"]
+
+def is_no(text: str) -> bool:
+    return text.lower() in CONFIRM_WORDS["no"]
 
 # 📢 Мои объявления
 @router.message(Command("my_ads"))
@@ -233,21 +244,61 @@ async def photos_done(message: Message, state: FSMContext):
         await state.set_state(AdForm.confirm)
         
         
-@router.message(AdForm.confirm, F.text.lower() == "да")
+@router.message(AdForm.confirm)
 async def ad_confirm(message: Message, state: FSMContext):
     data = await state.get_data()
     user = await Users.get(user_id=message.from_user.id)
+    lang = user.lang
+    text = message.text.strip().lower()
 
-    await Ads.create(
-        user_id=user.user_id,
-        title=data["title"],
-        price=data["price"],
-        size=data["size"],
-        condition=data["condition"],
-        photos=",".join(data.get("photos", [])) if data.get("photos") else None
-    )
-    await message.answer(TEXTS["ad_sent"][user.lang], reply_markup=main_keyboard(user.lang))
-    await state.clear()
+    # Если отказался
+    if is_no(text):
+        await message.answer(TEXTS["ad_cancel"][lang], reply_markup=main_keyboard(lang))
+        await state.clear()
+        return
+
+    # Если подтвердил
+    if is_yes(text):
+        ad = await Ads.create(
+            user_id=user.user_id,
+            title=data["title"],
+            price=data["price"],
+            size=data["size"],
+            condition=data["condition"],
+            photos=",".join(data.get("photos", [])) if data.get("photos") else None
+        )
+
+        # Сообщение пользователю
+        await message.answer(TEXTS["ad_sent"][lang], reply_markup=main_keyboard(lang))
+
+        # Отправка в группу модерации
+        ad_text = (
+            f"📝 Новое объявление #{ad.id}\n\n"
+            f"📌 {data['title']}\n"
+            f"💰 {data['price']} UZS\n"
+            f"📏 {data['size']}\n"
+            f"⚡ {data['condition']}\n\n"
+            f"👤 Пользователь: {message.from_user.mention}"
+        )
+
+        if data.get("photos"):
+            media = []
+            for i, file_id in enumerate(data["photos"]):
+                if i == 0:
+                    # Первое фото + текст
+                    media.append({"type": "photo", "media": file_id, "caption": ad_text})
+                else:
+                    media.append({"type": "photo", "media": file_id})
+
+            await bot.send_media_group(chat_id=ADMIN_GROUP_ID, media=media)
+        else:
+            await bot.send_message(chat_id=ADMIN_GROUP_ID, text=ad_text)
+
+        await state.clear()
+        return
+
+    # Если что-то другое
+    await message.answer(TEXTS["ad_confirm_repeat"][lang])
 
 
 # ✏️ Редактирование объявления
