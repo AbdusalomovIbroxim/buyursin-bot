@@ -239,12 +239,12 @@ async def ad_confirm(message: Message, state: FSMContext):
     user = await Users.get(user_id=message.from_user.id)
 
     await Ads.create(
-        user=user,
+        user_id=user.user_id,
         title=data["title"],
         price=data["price"],
         size=data["size"],
         condition=data["condition"],
-        photo=data.get("photo")
+        photos=",".join(data.get("photos", [])) if data.get("photos") else None
     )
     await message.answer(TEXTS["ad_sent"][user.lang], reply_markup=main_keyboard(user.lang))
     await state.clear()
