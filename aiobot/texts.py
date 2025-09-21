@@ -9,8 +9,40 @@ TEXTS = {
         "uz": "Ushbu bot sizga e'lon joylashtirishda yordam beradi.",
         "en": "This bot will help you submit an ad."
     },
-    "choose_lang": {
-        "ru": "🇷🇺 Русский", "uz": "🇺🇿 O‘zbekcha", "en": "🇬🇧 English"
+    "lang_prompt": {
+        "ru": "Пожалуйста, выберите язык:",
+        "uz": "Iltimos, tilni tanlang:",
+        "en": "Please select a language:"
+    },
+    "invalid_lang": {
+        "ru": "❌ Пожалуйста, выберите язык через кнопки ниже.",
+        "uz": "❌ Iltimos, tilni faqat tugmalar orqali tanlang.",
+        "en": "❌ Please select a language using the buttons below."
+    },
+    "ask_phone": {
+        "ru": "Пожалуйста, отправьте свой номер телефона, нажав на кнопку ниже.",
+        "uz": "Iltimos, quyidagi tugmani bosib telefon raqamingizni yuboring.",
+        "en": "Please send your phone number by pressing the button below."
+    },
+    "invalid_phone": {
+        "ru": "❌ Пожалуйста, используйте кнопку ниже, чтобы отправить свой номер телефона.",
+        "uz": "❌ Iltimos, telefon raqamingizni yuborish uchun tugmadan foydalaning.",
+        "en": "❌ Please use the button below to send your phone number."
+    },
+    "invalid_contact": {
+        "ru": "❌ Пожалуйста, отправьте СВОЙ номер через кнопку.",
+        "uz": "❌ Iltimos, faqat O‘Z raqamingizni yuboring.",
+        "en": "❌ Please send only YOUR phone number using the button."
+    },
+    "reg_success": {
+        "ru": "Регистрация прошла успешно!",
+        "uz": "Ro'yxatdan o'tish muvaffaqiyatli yakunlandi!",
+        "en": "Registration successful!"
+    },
+    "send_phone": {
+        "ru": "Отправить номер телефона",
+        "uz": "Telefon raqamni yuboring",
+        "en": "Send phone number"
     },
     "ad_title": {
         "ru": "Введите название и краткое описание товара (например: «Куртка Zara, мужская, чёрная, в хорошем состоянии»). Укажите бренд, цвет и особенности вещи — так её быстрее купят.",
@@ -18,9 +50,9 @@ TEXTS = {
         "en": "Enter the product name and a short description (e.g., “Zara jacket, men’s, black, in good condition”). Mention the brand, color, and features — it will help sell faster."
     },
     "ad_price": {
-        "ru": "Введите цену:",
-        "uz": "Narxni kiriting:",
-        "en": "Enter the price:"
+        "ru": "Введите цену товара.\n\nПримеры: 100000 som, 200$, 100k, 100к",
+        "uz": "Mahsulot narxini kiriting.\n\nMisollar: 100000 som, 200$, 100k, 100к",
+        "en": "Enter the product price.\n\nExamples: 100000 som, 200$, 100k, 100к"
     },
     "ad_size": {
         # "ru": "Введите размер (кв.м, литры и т.п.):",

@@ -8,3 +8,8 @@ class AdForm(StatesGroup):
     condition = State()
     photos = State()
     confirm = State() 
+    
+
+class Register(StatesGroup):
+    language = State()
+    phone = State()
