@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, update, delete, Date
+from sqlalchemy import Column, Integer, String, update, delete, Date, BigInteger
 from sqlalchemy.future import select
 
 from aiobot.database import Base, db
@@ -9,7 +9,7 @@ from aiobot.database import Base, db
 # auto create id
 class Users(Base):
     __tablename__ = "users"
-    user_id = Column(String(50), unique=True)
+    user_id = Column(BigInteger, unique=True)
     full_name = Column(String(30))
     phone_number = Column(String(30))
     lang = Column(String(2))
