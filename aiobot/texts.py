@@ -44,6 +44,11 @@ TEXTS = {
         "uz": "Telefon raqamni yuboring",
         "en": "Send phone number"
     },
+    "add_ad": {
+        "ru": "➕ Подать объявление",
+        "uz": "➕ E'lon joylashtirish",
+        "en": "➕ Submit Ad"
+    },
     "ad_title": {
         "ru": "Введите название и краткое описание товара (например: «Куртка Zara, мужская, чёрная, в хорошем состоянии»). Укажите бренд, цвет и особенности вещи — так её быстрее купят.",
         "uz": "Mahsulot nomi va qisqa tavsifini kiriting (masalan: «Zara kurtkasi, erkaklar uchun, qora rang, yaxshi holatda»). Brend, rang va xususiyatlarini yozing — shunda tezroq sotiladi.",
