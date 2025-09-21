@@ -122,6 +122,11 @@ TEXTS = {
         "shoes": {"ru": "👟 Обувь", "uz": "👟 Oyoq kiyim", "en": "👟 Shoes"},
         "accessories": {"ru": "👜 Аксессуары", "uz": "👜 Aksessuarlar", "en": "👜 Accessories"},
     },
+    "conditions": {
+        "ru": ["🆕 Новый", "✨ Почти новый", "👍 Хорошее", "👌 Среднее", "🔧 Требует ремонта"],
+        "uz": ["🆕 Yangi", "✨ Deyarli yangi", "👍 Yaxshi", "👌 O‘rtacha", "🔧 Ta’mirlash kerak"],
+        "en": ["🆕 New", "✨ Almost new", "👍 Good", "👌 Fair", "🔧 Needs repair"]
+    },
     "ad_size_clothing": {
         "ru": "Выберите размер одежды или введите свой:",
         "uz": "Kiyim o'lchamini tanlang yoki o'zingiz yozing:",
@@ -132,5 +137,9 @@ TEXTS = {
         "uz": "Oyoq kiyim o'lchamini tanlang yoki o'zingiz yozing:",
         "en": "Select shoe size or enter your own:"
     },
-
+    "photos_done": {
+        "ru": "✅ Готово",
+        "uz": "✅ Tayyor",
+        "en": "✅ Done"
+    }
 } 

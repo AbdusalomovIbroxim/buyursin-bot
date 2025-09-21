@@ -42,6 +42,8 @@ def size_category_keyboard(lang: str = "ru"):
         [KeyboardButton(text=TEXTS["size_category"]["accessories"][lang])]
     ]
     return ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
+
+
 # Клавиатура размеров одежды
 def clothing_size_keyboard():
     buttons = [
@@ -62,15 +64,16 @@ def shoes_size_keyboard():
     ]
     return ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
 
-# Клавиатура состояния
 
-def condition_keyboard():
-    condition_buttons = [
-        [KeyboardButton(text="Новый"), KeyboardButton(text="Почти новый")],
-        [KeyboardButton(text="Хорошее"), KeyboardButton(text="Среднее")],
-        [KeyboardButton(text="Требует ремонта")]
+# Клавиатура состояния
+def condition_keyboard(lang: str):
+    items = TEXTS["conditions"].get(lang, TEXTS["conditions"]["ru"])
+    buttons = [
+        [KeyboardButton(text=items[0]), KeyboardButton(text=items[1])],
+        [KeyboardButton(text=items[2]), KeyboardButton(text=items[3])],
+        [KeyboardButton(text=items[4])]
     ]
-    return ReplyKeyboardMarkup(keyboard=condition_buttons, resize_keyboard=True)
+    return ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
 
 # Клавиатура подтверждения
 
@@ -85,8 +88,9 @@ def confirm_keyboard(lang):
         resize_keyboard=True
     )
 
-def photos_keyboard():
+def photos_keyboard(lang: str):
+    button_text = TEXTS["photos_done"].get(lang, TEXTS["photos_done"]["ru"])
     return ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton(text="Готово")]],
+        keyboard=[[KeyboardButton(text=button_text)]],
         resize_keyboard=True
-    ) 
+    )
