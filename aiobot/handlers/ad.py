@@ -194,6 +194,45 @@ async def ad_photos(message: Message, state: FSMContext):
             f"Отправьте ещё или нажмите 'Готово'."
         )
 
+
+@router.message(AdForm.photos, F.text)
+async def photos_done(message: Message, state: FSMContext):
+    user = await Users.get(user_id=message.from_user.id)
+    lang = user.lang
+    done_text = TEXTS["photos_done"].get(lang, TEXTS["photos_done"]["ru"])
+
+    # Проверяем, нажал ли юзер кнопку "Готово"
+    if message.text.strip() == done_text:
+        data = await state.get_data()
+        photos = data.get("photos", [])
+
+        # Текст объявления
+        ad_text = (
+            f"{TEXTS['ad_confirm'][lang]}\n\n"
+            f"📌 {data['title']}\n"
+            f"💰 {data['price']} UZS\n"
+            f"📏 {data['size']}\n"
+            f"⚡ {data['condition']}\n"
+        )
+
+        # Если есть несколько фото — отправляем альбом
+        if photos:
+            media = [InputMediaPhoto(media=p) for p in photos[:10]]
+            media[0].caption = ad_text  # текст к первой фотке
+            await message.answer_media_group(media)
+        else:
+            await message.answer(ad_text)
+
+        # Предлагаем подтвердить
+        confirm_text = {
+            "ru": "Отправить объявление? (Да / Нет)",
+            "uz": "E'lonni yuborasizmi? (Ha / Yo'q)",
+            "en": "Send the ad? (Yes / No)"
+        }
+        await message.answer(confirm_text[lang])
+        await state.set_state(AdForm.confirm)
+        
+        
 @router.message(AdForm.confirm, F.text.lower() == "да")
 async def ad_confirm(message: Message, state: FSMContext):
     data = await state.get_data()
