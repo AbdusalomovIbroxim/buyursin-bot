@@ -3,9 +3,10 @@ from aiogram import Router, F
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command
-from aiogram.types import InputMediaPhoto
+from aiogram.types import InputMediaPhoto, CallbackQuery
 from aiogram.utils.markdown import hlink
 from aiobot.buttons.keyboards.reply import main_keyboard, lang_keyboard, size_category_keyboard, clothing_size_keyboard, photos_keyboard, condition_keyboard
+from aiobot.buttons.keyboards.inline import admin_inline_keyboard, user_confirm_keyboard
 from aiobot.models import Ads, Users
 from aiobot.texts import TEXTS
 from aiobot.states import AdForm, Register
@@ -215,6 +216,10 @@ async def photos_done(message: Message, state: FSMContext):
 
     # Проверяем, нажал ли юзер кнопку "Готово"
     if message.text.strip() == done_text:
+        if not photos:
+            await message.answer("❌ Нужно добавить хотя бы одно фото.")
+            return
+
         data = await state.get_data()
         photos = data.get("photos", [])
 
@@ -234,32 +239,35 @@ async def photos_done(message: Message, state: FSMContext):
             await message.answer_media_group(media, )
         else:
             await message.answer(ad_text)
-
-        # Предлагаем подтвердить
-        confirm_text = {
-            "ru": "Отправить объявление? (Да / Нет)",
-            "uz": "E'lonni yuborasizmi? (Ha / Yo'q)",
-            "en": "Send the ad? (Yes / No)"
+        
+        confirm_texts = {
+            "ru": "Проверьте данные, всё верно?",
+            "uz": "Ma’lumotlarni tekshiring, hammasi to‘g‘ri?",
+            "en": "Check the data, everything correct?"
         }
-        await message.answer(confirm_text[lang])
+
+        # Пример отправки пользователю после добавления всех данных и фото
+        await bot.send_message(
+            user.user_id,
+            text=confirm_texts.get(user.lang, confirm_texts["ru"]),
+            reply_markup=user_confirm_keyboard(user.lang)
+        )
+
         await state.set_state(AdForm.confirm)
         
-        
-@router.message(AdForm.confirm)
-async def ad_confirm(message: Message, state: FSMContext):
-    data = await state.get_data()
-    user = await Users.get(user_id=message.from_user.id)
-    lang = user.lang
-    text = message.text.strip().lower()
 
-    # Если отказался
-    if is_no(text):
-        await message.answer(TEXTS["ad_cancel"][lang], reply_markup=main_keyboard(lang))
+@router.message(AdForm.confirm, lambda c: c.data and c.data.startswith("user_confirm_"))
+async def ad_confirm(query: CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    user = await Users.get(user_id=query)
+    lang = user.lang
+
+    if query.data == "user_confirm_no":
+        await query.message.edit_text(TEXTS["ad_cancel"][lang], reply_markup=None)
         await state.clear()
         return
 
-    # Если подтвердил
-    if is_yes(text):
+    if query.data == "user_confirm_yes":
         ad = await Ads.create(
             user_id=user.user_id,
             title=data["title"],
@@ -269,35 +277,40 @@ async def ad_confirm(message: Message, state: FSMContext):
             photos=",".join(data.get("photos", [])) if data.get("photos") else None
         )
 
-        # Сообщение пользователю
-        await message.answer(TEXTS["ad_sent"][lang], reply_markup=main_keyboard(lang))
+        await bot.send_message(user.user_id, TEXTS["ad_sent"][lang], reply_markup=main_keyboard(lang))
 
-        # Отправка в группу модерации
         ad_text = (
             f"📝 Новое объявление #{ad.pk}\n\n"
             f"📌 {TEXTS['field_title'][lang]}: {data['title']}\n"
             f"💰 {TEXTS['field_price'][lang]}: {data['price']} UZS\n"
             f"📏 {TEXTS['field_size'][lang]}: {data['size']}\n"
             f"⚡ {TEXTS['field_condition'][lang]}: {data['condition']}\n"
-            f"👤 Пользователь: {hlink(message.from_user.full_name, f'tg://user?id={message.from_user.id}')}"
-            f"📞: {user.phone_number}\n"
+            f"👤 Пользователь: {hlink(user.full_name, f'tg://user?id={user.user_id}')}\n"
+            f"📞: {user.phone_number}\n\n"
+            "Управление объявлением:"
         )
 
         if data.get("photos"):
             media = []
             for i, file_id in enumerate(data["photos"]):
                 if i == 0:
-                    # Первое фото + текст
-                    media.append({"type": "photo", "media": file_id, "caption": ad_text, "parse_mode": "HTML"})
+                    media.append({
+                        "type": "photo",
+                        "media": file_id,
+                        "caption": ad_text,
+                        "parse_mode": "HTML"
+                    })
                 else:
                     media.append({"type": "photo", "media": file_id})
 
             await bot.send_media_group(chat_id=ADMIN_GROUP_ID, media=media)
+            # Кнопки добавляем отдельным сообщением
+            await bot.send_message(chat_id=ADMIN_GROUP_ID, text="Выберите действие:", reply_markup=admin_inline_keyboard(ad.pk))
         else:
-            await bot.send_message(chat_id=ADMIN_GROUP_ID, text=ad_text, parse_mode="HTML")
+            await bot.send_message(chat_id=ADMIN_GROUP_ID, text=ad_text, parse_mode="HTML", reply_markup=admin_inline_keyboard(ad.pk))
 
         await state.clear()
         return
 
-    # Если что-то другое
-    await message.answer(TEXTS["ad_confirm_repeat"][lang])
+    await bot.send_message(user.user_id, TEXTS["ad_confirm_repeat"][lang])
+
