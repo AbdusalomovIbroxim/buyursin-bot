@@ -117,6 +117,11 @@ TEXTS = {
         "uz": "Mahsulot turini tanlang:\n\n👕 Kiyim\n👟 Oyoq kiyim\n👜 Aksessuarlar",
         "en": "Choose a category:\n\n👕 Clothing\n👟 Shoes\n👜 Accessories"
     },
+    "size_category": {
+        "clothes": {"ru": "👕 Одежда", "uz": "👕 Kiyim", "en": "👕 Clothes"},
+        "shoes": {"ru": "👟 Обувь", "uz": "👟 Oyoq kiyim", "en": "👟 Shoes"},
+        "accessories": {"ru": "👜 Аксессуары", "uz": "👜 Aksessuarlar", "en": "👜 Accessories"},
+    },
     "ad_size_clothing": {
         "ru": "Выберите размер одежды или введите свой:",
         "uz": "Kiyim o'lchamini tanlang yoki o'zingiz yozing:",

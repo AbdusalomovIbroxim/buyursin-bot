@@ -121,7 +121,7 @@ async def ad_price(message: Message, state: FSMContext):
         return
 
     await state.update_data(price=price)
-    await message.answer(TEXTS["ad_size_category"][lang], reply_markup=size_category_keyboard())
+    await message.answer(TEXTS["ad_size_category"][lang], reply_markup=size_category_keyboard(lang))
     await state.set_state(AdForm.size_category)
 
 

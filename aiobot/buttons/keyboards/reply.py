@@ -31,15 +31,17 @@ def phone_keyboard(lang):
     )
 
 
-# Клавиатура выбора категории размеров
-def size_category_keyboard():
+def size_category_keyboard(lang: str = "ru"):
+    # fallback если язык неизвестен
+    if lang not in ["ru", "uz", "en"]:
+        lang = "ru"
+
     buttons = [
-        [KeyboardButton(text="👕 Одежда")],
-        [KeyboardButton(text="👟 Обувь")],
-        [KeyboardButton(text="👜 Аксессуары")]
+        [KeyboardButton(text=TEXTS["size_category"]["clothes"][lang])],
+        [KeyboardButton(text=TEXTS["size_category"]["shoes"][lang])],
+        [KeyboardButton(text=TEXTS["size_category"]["accessories"][lang])]
     ]
     return ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
-
 # Клавиатура размеров одежды
 def clothing_size_keyboard():
     buttons = [
