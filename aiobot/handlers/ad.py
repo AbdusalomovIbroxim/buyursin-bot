@@ -209,17 +209,17 @@ async def photos_done(message: Message, state: FSMContext):
         # Текст объявления
         ad_text = (
             f"{TEXTS['ad_confirm'][lang]}\n\n"
-            f"📌 <b>{TEXTS['field_title'][lang]}:</b> {data['title']}\n"
-            f"💰 <b>{TEXTS['field_price'][lang]}:</b> {data['price']} UZS\n"
-            f"📏 <b>{TEXTS['field_size'][lang]}:</b> {data['size']}\n"
-            f"⚡ <b>{TEXTS['field_condition'][lang]}:</b> {data['condition']}\n"
+            f"📌 {TEXTS['field_title'][lang]}: {data['title']}\n"
+            f"💰 {TEXTS['field_price'][lang]}: {data['price']} UZS\n"
+            f"📏 {TEXTS['field_size'][lang]}: {data['size']}\n"
+            f"⚡ {TEXTS['field_condition'][lang]}: {data['condition']}\n"
         )
 
         # Если есть несколько фото — отправляем альбом
         if photos:
             media = [InputMediaPhoto(media=p) for p in photos[:10]]
             media[0].caption = ad_text  # текст к первой фотке
-            await message.answer_media_group(media)
+            await message.answer_media_group(media, )
         else:
             await message.answer(ad_text)
 
