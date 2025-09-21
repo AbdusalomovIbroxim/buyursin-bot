@@ -11,6 +11,7 @@ class Ads(Base):
     price = Column(String)
     size = Column(String)
     condition = Column(String)
+    defect_info = Column(String, nullable=True)
     photos = Column(String)
     status = Column(String, default='pending')
     admin_message_id = Column(Integer, nullable=True)
