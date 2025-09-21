@@ -152,18 +152,19 @@ async def ad_condition(message: Message, state: FSMContext):
 @router.message(AdForm.photos, F.photo)
 async def ad_photos(message: Message, state: FSMContext):
     data = await state.get_data()
-    user = await Users.get(user_id=message.from_user.id)
+    photos = data.get("photos", [])
 
-    # сохраняем только последнее фото (или можно список)
-    await state.update_data(photo=message.photo[-1].file_id)
+    if len(photos) >= 10:
+        await message.answer("❌ Нельзя добавить больше 10 фотографий.")
+        return
 
-    text = (
-        f"{TEXTS['ad_confirm'][user.lang]}\n\n"
-        f"📌 {data['title']}\n💰 {data['price']} UZS\n📏 {data['size']}\n"
-        f"⚡ {data['condition']}\n"
+    photos.append(message.photo[-1].file_id)
+    await state.update_data(photos=photos)
+
+    await message.answer(
+        f"Фото сохранено ✅ ({len(photos)}/{10}). "
+        f"Отправьте ещё или нажмите 'Готово'."
     )
-    await message.answer(text)
-    await state.set_state(AdForm.confirm)
 
 
 @router.message(AdForm.confirm, F.text.lower() == "да")
