@@ -8,7 +8,7 @@ from aiobot.database import Base, db
 class Ads(Base):
     __tablename__ = "ads"
 
-    user_id = Column(BigInteger, ForeignKey('users.pk'))
+    user_id = Column(BigInteger, ForeignKey('users.user_id'))
     title = Column(String)
     price = Column(Float)
     size = Column(String)
