@@ -168,6 +168,18 @@ TEXTS = {
         "en": "Photos"
     },
     "field_defect": {
-        
+        "ru": "Дефекты",
+        "uz": "Nuqsonlar",
+        "en": "Defects"
+    },
+    "ad_defect": {
+        "ru": "Выберите состояние товара (дефекты):",
+        "uz": "Mahsulot holatini tanlang (nuqsonlar):",
+        "en": "Select the product condition (defects):"
+    },
+     "defects": {
+        "ru": ["Есть пятна", "Есть брак", "Нет дефектов"],
+        "uz": ["Dog‘ bor", "Nuqson bor", "Defekt yo‘q"],
+        "en": ["Stains", "Defect", "No defects"]
     }
 } 

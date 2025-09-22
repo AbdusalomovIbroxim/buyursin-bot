@@ -173,7 +173,7 @@ async def ad_size(message: Message, state: FSMContext):
 async def ad_condition(message: Message, state: FSMContext):
     await state.update_data(condition=message.text)
     user = await Users.get(user_id=message.from_user.id)
-    await message.answer(TEXTS["ad_photos"][user.lang], reply_markup=photos_keyboard(user.lang))
+    await message.answer(TEXTS['ad_defect'], reply_markup=defect_keyboard(user.lang))
     await state.set_state(AdForm.defect)
 
 # Пример хендлера для выбора состояния вещи
@@ -183,18 +183,8 @@ async def ad_condition(message: Message, state: FSMContext):
     user = await Users.get(user_id=message.from_user.id)
     lang = user.lang
 
-    # Если текст не совпадает с одной из кнопок, показываем клавиатуру
-    valid_texts = {
-        "ru": ["Есть пятна", "Есть брак", "Нет дефектов"],
-        "uz": ["Dog‘ bor", "Nuqson bor", "Defekt yo‘q"],
-        "en": ["Stains", "Defect", "No defects"]
-    }
-
-    if text not in valid_texts[lang]:
-        await message.answer(
-            "Выберите состояние товара:", 
-            reply_markup=defect_keyboard(lang)
-        )
+    if text not in TEXTS["defects"][lang]:
+        await message.answer(TEXTS['ad_defect'], reply_markup=defect_keyboard(user.lang))
         return
 
     await state.update_data(condition=text)

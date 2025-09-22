@@ -97,12 +97,7 @@ def photos_keyboard(lang: str):
 
 
 def defect_keyboard(lang: str) -> ReplyKeyboardMarkup:
-    texts = {
-        "ru": ["Есть пятна", "Есть брак", "Нет дефектов"],
-        "uz": ["Dog‘ bor", "Nuqson bor", "Defekt yo‘q"],
-        "en": ["Stains", "Defect", "No defects"]
-    }
-    buttons = [KeyboardButton(text=t) for t in texts[lang]]
+    buttons = [KeyboardButton(text=t) for t in TEXTS["defects"][lang]]
     return ReplyKeyboardMarkup(
         keyboard=[[b] for b in buttons],
         resize_keyboard=True,
