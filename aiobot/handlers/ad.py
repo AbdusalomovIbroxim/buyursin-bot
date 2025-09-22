@@ -187,7 +187,7 @@ async def ad_condition(message: Message, state: FSMContext):
         await message.answer(TEXTS['ad_defect'], reply_markup=defect_keyboard(user.lang))
         return
 
-    await state.update_data(condition=text)
+    await state.update_data(defect=text)
     await message.answer(
         TEXTS["ad_photos"][lang],
         reply_markup=photos_keyboard(lang)
