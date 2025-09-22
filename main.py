@@ -48,7 +48,7 @@ dis.include_router(admin.router)
 
 async def on_startup():
     await db.init()
-    await db.drop_all()
+    # await db.drop_all()
     await db.create_all()
 
 
