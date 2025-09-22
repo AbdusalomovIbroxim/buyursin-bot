@@ -3,6 +3,7 @@ import aiobot.handlers.commands as commands
 import aiobot.handlers.user as user
 import aiobot.handlers.ad as ad
 import aiobot.handlers.admin as admin
+from aiobot.middlewere import auth_middleware
 import asyncio
 import logging
 from dispatcher.dispatcher import dis, bot
@@ -30,10 +31,19 @@ def check_single_instance():
         return False
 
 
-dis.include_router(commands.router)
 dis.include_router(user.router)
+
+
+commands.router.message.middleware(auth_middleware.AuthMiddleware())
+ad.router.message.middleware(auth_middleware.AuthMiddleware())
+admin.router.message.middleware(auth_middleware.AuthMiddleware())
+
+
+dis.include_router(commands.router)
 dis.include_router(ad.router)
 dis.include_router(admin.router)
+
+
 
 
 async def on_startup():

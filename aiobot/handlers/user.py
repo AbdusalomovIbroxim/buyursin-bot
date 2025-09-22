@@ -33,11 +33,14 @@ async def cmd_start(message: Message, state: FSMContext):
 @router.message(Command("lang"))
 async def change_lang(message: Message, state: FSMContext):
     await state.clear()
-    logging.info(f"/lang: user_id={message.from_user.id}")
-    await message.answer(
-        TEXTS["lang_prompt"]["ru"],
-        reply_markup=lang_keyboard()
-    )
+    if not await Users.get(user_id=message.from_user.user_id):
+        await message.answer(TEXTS["welcome"]["ru"], reply_markup=lang_keyboard())
+    else:
+        logging.info(f"/lang: user_id={message.from_user.id}")
+        await message.answer(
+            TEXTS["lang_prompt"]["ru"],
+            reply_markup=lang_keyboard()
+        )
     await state.set_state(Register.language)
 
 
