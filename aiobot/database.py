@@ -7,7 +7,7 @@ from config import Config
 
 
 class TableBase:
-    pk = Column(Integer, primary_key=True)
+    pk = Column(Integer, primary_key=True, autoincrement=True)
 
     @declared_attr
     def __tablename__(self) -> str:
