@@ -20,50 +20,58 @@ class TableBase:
 
     @classmethod
     async def create(cls, pk, **kwargs):
-        user = cls(pk=pk, **kwargs)
-        db.add(user)
-        await cls.commit()
-        return user
+        async for session in db.get_session():
+            obj = cls(pk=pk, **kwargs)
+            session.add(obj)
+            try:
+                await session.commit()
+                return obj
+            except Exception:
+                await session.rollback()
+                raise
 
     @classmethod
     async def get(cls, pk):
-        query = select(cls).where(cls.pk == pk)
-        users = await db.execute(query)
-        user, = users.first() or None,
-        return user
+        async for session in db.get_session():
+            query = select(cls).where(cls.pk == pk)
+            result = await session.execute(query)
+            return result.scalars().first()
 
     @classmethod
     async def update(cls, pk, **kwargs):
-        query = (
-            update(cls)
-            .where(cls.pk == pk)
-            .values(**kwargs)
-            .execution_options(synchronize_session="fetch")
-        )
-        await db.execute(query)
-        await cls.commit()
+        async for session in db.get_session():
+            query = (
+                update(cls)
+                .where(cls.pk == pk)
+                .values(**kwargs)
+                .execution_options(synchronize_session="fetch")
+            )
+            try:
+                await session.execute(query)
+                await session.commit()
+            except Exception:
+                await session.rollback()
+                raise
 
     @classmethod
     async def delete(cls, pk):
-        query = delete(cls).where(cls.pk == pk)
-        await db.execute(query)
-        await cls.commit()
-        return True
-
-    @classmethod
-    async def commit(cls):
-        try:
-            await db.commit()
-        except Exception:
-            await db.rollback()
-            raise
+        async for session in db.get_session():
+            query = delete(cls).where(cls.pk == pk)
+            try:
+                await session.execute(query)
+                await session.commit()
+                return True
+            except Exception:
+                await session.rollback()
+                raise
 
     @classmethod
     async def get_all(cls):
-        query = select(cls)
-        users = await db.execute(query)
-        users = users.scalars().all()
-        return users
+        async for session in db.get_session():
+            query = select(cls)
+            result = await session.execute(query)
+            return result.scalars().all()
+
 
 
 Base = declarative_base(cls=TableBase)
@@ -71,15 +79,18 @@ Base = declarative_base(cls=TableBase)
 
 class AsyncDatabaseSession:
     def __init__(self):
-        self._session = None
         self._engine = None
-
-    def __getattr__(self, name):
-        return getattr(self._session, name)
+        self._sessionmaker = None
 
     async def init(self):
         self._engine = create_async_engine(Config.DB_CONFIG, echo=True, future=True)
-        self._session = sessionmaker(self._engine, expire_on_commit=False, class_=AsyncSession)()  # noqa
+        self._sessionmaker = sessionmaker(
+            self._engine, expire_on_commit=False, class_=AsyncSession
+        )
+
+    async def get_session(self) -> AsyncSession: # type: ignore
+        async with self._sessionmaker() as session:
+            yield session
 
     async def create_all(self):
         async with self._engine.begin() as conn:
@@ -88,16 +99,6 @@ class AsyncDatabaseSession:
     async def drop_all(self):
         async with self._engine.begin() as conn:
             await conn.run_sync(Base.metadata.drop_all)
-
-    # async def create_all(self):
-    #     # Synchronous operation to create all tables
-    #     with self._engine.begin() as conn:
-    #         Base.metadata.create_all(conn)
-
-    # async def drop_all(self):
-    #     # Synchronous operation to drop all tables
-    #     with self._engine.begin() as conn:
-    #         Base.metadata.drop_all(conn)
 
 
 db = AsyncDatabaseSession()
