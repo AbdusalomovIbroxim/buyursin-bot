@@ -1,7 +1,7 @@
 from aiogram import BaseMiddleware, Router
 from aiogram.types import Message
 from typing import Callable, Awaitable, Dict, Any
-from aiobot.database import db
+from aiobot.models.users import Users
 
 
 router = Router()
@@ -13,10 +13,10 @@ class AuthMiddleware(BaseMiddleware):
                        event: Message,
                        data: Dict[str, Any]) -> Any:
         user_id = event.from_user.id
-        user = db.get_all(user_id)
+        user = Users.get(user_id=user_id)
 
-        # если не авторизован
-        if not user or not user.is_verified:
+
+        if not user:
             await event.answer("❌ Вы не авторизованы. Используйте /start для входа.")
             return  # прерываем цепочку
         return await handler(event, data)
