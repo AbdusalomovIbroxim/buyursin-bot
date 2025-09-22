@@ -167,4 +167,7 @@ TEXTS = {
         "uz": "Rasmlar",
         "en": "Photos"
     },
+    "field_defect": {
+        
+    }
 } 

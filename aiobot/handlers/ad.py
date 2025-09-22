@@ -1,11 +1,12 @@
+import re
 import asyncio
 from aiogram import Router, F
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command
-from aiogram.types import InputMediaPhoto, CallbackQuery
+from aiogram.types import InputMediaPhoto, CallbackQuery, ReplyKeyboardRemove
 from aiogram.utils.markdown import hlink
-from aiobot.buttons.keyboards.reply import main_keyboard, lang_keyboard, size_category_keyboard, clothing_size_keyboard, photos_keyboard, condition_keyboard
+from aiobot.buttons.keyboards.reply import main_keyboard, lang_keyboard, size_category_keyboard, clothing_size_keyboard, photos_keyboard, condition_keyboard, defect_keyboard
 from aiobot.buttons.keyboards.inline import admin_inline_keyboard, user_confirm_keyboard
 from aiobot.models import Ads, Users
 from aiobot.texts import TEXTS
@@ -85,7 +86,6 @@ async def ad_title(message: Message, state: FSMContext):
     await state.set_state(AdForm.price)
 
 
-import re
 
 @router.message(AdForm.price, F.text)
 async def ad_price(message: Message, state: FSMContext):
@@ -93,9 +93,8 @@ async def ad_price(message: Message, state: FSMContext):
     lang = user.lang
 
     text = message.text.strip().lower()
-    price = None
 
-    # ❌ Отрицательные значения сразу отбрасываем
+    # ❌ Проверка отрицательных значений
     if "-" in text:
         await message.answer({
             "ru": "❌ Цена не может быть отрицательной.",
@@ -104,26 +103,26 @@ async def ad_price(message: Message, state: FSMContext):
         }[lang])
         return
 
-    # Форматы: число, число + som/sum/$, число + k/к
-    match = re.match(r"^(\d+)(k|к|som|sum|\$)?$", text)
+    # Форматы: число, число + k/к, число + som/sum/so'm/сум
+    match = re.match(r"^(\d+(?:\.\d+)?)(k|к|som|sum|so'm|сум)?$", text)
     if not match:
         await message.answer({
-            "ru": "❌ Неверный формат цены. Примеры: 100000 som, 200$, 100k",
-            "uz": "❌ Narx formati noto‘g‘ri. Misollar: 100000 som, 200$, 100k",
-            "en": "❌ Invalid price format. Examples: 100000 som, 200$, 100k"
+            "ru": "❌ Неверный формат цены. Примеры: 100000, 100k, 100000 sum",
+            "uz": "❌ Narx formati noto‘g‘ri. Misollar: 100000, 100k, 100000 sum",
+            "en": "❌ Invalid price format. Examples: 100000, 100k, 100000 sum"
         }[lang])
         return
 
-    amount = int(match.group(1))
+    amount = float(match.group(1))
     suffix = match.group(2)
 
-    # Обработка сокращений
-    if suffix in ("k", "к"):   # 100k → 100000
+    # Конвертация сокращений
+    if suffix in ("k", "к"):
         price = amount * 1000
-    else:                       # som / sum / $ / ничего → считаем как есть
+    else:
         price = amount
 
-    # Проверка минимальной суммы
+    # Проверка минимальной и максимальной суммы
     if price < 100:
         await message.answer({
             "ru": "❌ Слишком низкая цена. Введите сумму не меньше 100 сум.",
@@ -132,7 +131,6 @@ async def ad_price(message: Message, state: FSMContext):
         }[lang])
         return
 
-    # Лимит максимума
     if price > 10_000_000:
         await message.answer({
             "ru": "❌ Слишком высокая цена. Введите сумму меньше 10 млн.",
@@ -141,16 +139,25 @@ async def ad_price(message: Message, state: FSMContext):
         }[lang])
         return
 
-    await state.update_data(price=price)
+    # Сохраняем как float
+    await state.update_data(price=float(price))
     await message.answer(TEXTS["ad_size_category"][lang], reply_markup=size_category_keyboard(lang))
     await state.set_state(AdForm.size_category)
+
 
 
 @router.message(AdForm.size_category, F.text)
 async def ad_size_category(message: Message, state: FSMContext):
     await state.update_data(size_category=message.text)
     user = await Users.get(user_id=message.from_user.id)
-    await message.answer(TEXTS["ad_size"][user.lang], reply_markup=clothing_size_keyboard())
+    category = message.text
+    if category == TEXTS["size_category"]["clothes"][user.lang]:
+        # Клавиатура с размерами одежды
+        await message.answer(TEXTS["ad_size"][user.lang], reply_markup=clothing_size_keyboard())
+    else:
+        # Для обуви и аксессуаров пользователь вводит размер сам
+        await message.answer(TEXTS["ad_size"][user.lang], reply_markup=ReplyKeyboardRemove())
+    
     await state.set_state(AdForm.size)
 
 
@@ -167,6 +174,34 @@ async def ad_condition(message: Message, state: FSMContext):
     await state.update_data(condition=message.text)
     user = await Users.get(user_id=message.from_user.id)
     await message.answer(TEXTS["ad_photos"][user.lang], reply_markup=photos_keyboard(user.lang))
+    await state.set_state(AdForm.defect)
+
+# Пример хендлера для выбора состояния вещи
+@router.message(AdForm.defect, F.text)
+async def ad_condition(message: Message, state: FSMContext):
+    text = message.text.strip()
+    user = await Users.get(user_id=message.from_user.id)
+    lang = user.lang
+
+    # Если текст не совпадает с одной из кнопок, показываем клавиатуру
+    valid_texts = {
+        "ru": ["Есть пятна", "Есть брак", "Нет дефектов"],
+        "uz": ["Dog‘ bor", "Nuqson bor", "Defekt yo‘q"],
+        "en": ["Stains", "Defect", "No defects"]
+    }
+
+    if text not in valid_texts[lang]:
+        await message.answer(
+            "Выберите состояние товара:", 
+            reply_markup=defect_keyboard(lang)
+        )
+        return
+
+    await state.update_data(condition=text)
+    await message.answer(
+        TEXTS["ad_photos"][lang],
+        reply_markup=photos_keyboard(lang)
+    )
     await state.set_state(AdForm.photos)
 
 
@@ -238,6 +273,7 @@ async def photos_done(message: Message, state: FSMContext):
             f"💰 {TEXTS['field_price'][lang]}: {data['price']} UZS\n"
             f"📏 {TEXTS['field_size'][lang]}: {data['size']}\n"
             f"⚡ {TEXTS['field_condition'][lang]}: {data['condition']}\n"
+            f"❗ {TEXTS['field_defect'][lang]}: {data['defect']}\n"
         )
 
         # Если есть несколько фото — отправляем альбом

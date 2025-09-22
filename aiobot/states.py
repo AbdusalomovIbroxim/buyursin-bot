@@ -8,6 +8,7 @@ class AdForm(StatesGroup):
     condition = State()
     photos = State()
     confirm = State() 
+    defect = State()
     
 
 class Register(StatesGroup):

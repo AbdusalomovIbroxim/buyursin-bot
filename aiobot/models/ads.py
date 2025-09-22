@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, update, delete, BigInteger
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, update, delete, BigInteger, Float
 from sqlalchemy.future import select
 
 from aiobot.database import Base, db
@@ -8,7 +8,7 @@ class Ads(Base):
     __tablename__ = "ads"
     user_id = Column(BigInteger, ForeignKey('users.pk'))
     title = Column(String)
-    price = Column(String)
+    price = Column(Float)
     size = Column(String)
     condition = Column(String)
     defect_info = Column(String, nullable=True)
