@@ -44,15 +44,14 @@ def size_category_keyboard(lang: str = "ru"):
     return ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
 
 
-# Клавиатура размеров одежды
 def clothing_size_keyboard():
     buttons = [
-        [KeyboardButton(text="XS (42)"), KeyboardButton(text="S (44)")],
-        [KeyboardButton(text="M (46-48)"), KeyboardButton(text="L (50-52)")],
-        [KeyboardButton(text="XL (54-56)"), KeyboardButton(text="XXL (58-60)")],
-        [KeyboardButton(text="XXXL (62-64)"), KeyboardButton(text="Другое")]
+        [KeyboardButton(text="XS"), KeyboardButton(text="S")],
+        [KeyboardButton(text="M"), KeyboardButton(text="L")],
+        [KeyboardButton(text="XL"), KeyboardButton(text="XXL")],
     ]
     return ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
+
 
 # Клавиатура размеров обуви
 def shoes_size_keyboard():
