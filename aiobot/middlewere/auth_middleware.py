@@ -13,7 +13,7 @@ class AuthMiddleware(BaseMiddleware):
                        event: Message,
                        data: Dict[str, Any]) -> Any:
         user_id = event.from_user.id
-        user = db.get_user(user_id)
+        user = db.get_all(user_id)
 
         # если не авторизован
         if not user or not user.is_verified:
