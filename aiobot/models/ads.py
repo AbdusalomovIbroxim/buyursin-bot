@@ -4,8 +4,10 @@ from sqlalchemy.future import select
 
 from aiobot.database import Base, db
 
+
 class Ads(Base):
     __tablename__ = "ads"
+
     user_id = Column(BigInteger, ForeignKey('users.pk'))
     title = Column(String)
     price = Column(Float)
@@ -28,42 +30,47 @@ class Ads(Base):
             photos=photos,
             status=status
         )
-        db.add(ad)
-        await cls.commit()
+        async for session in db.get_session():
+            session.add(ad)
+            await session.commit()
+            await session.refresh(ad)
         return ad
 
     @classmethod
     async def get(cls, ad_id):
-        query = select(cls).where(cls.pk == ad_id)
-        result = await db.execute(query)
-        ad = result.scalar_one_or_none()
-        return ad
+        async for session in db.get_session():
+            query = select(cls).where(cls.pk == ad_id)
+            result = await session.execute(query)
+            return result.scalar_one_or_none()
 
     @classmethod
     async def update_status(cls, ad_id, status):
-        query = (
-            update(cls)
-            .where(cls.pk == ad_id)
-            .values(status=status)
-            .execution_options(synchronize_session="fetch")
-        )
-        await db.execute(query)
-        await cls.commit()
+        async for session in db.get_session():
+            query = (
+                update(cls)
+                .where(cls.pk == ad_id)
+                .values(status=status)
+                .execution_options(synchronize_session="fetch")
+            )
+            await session.execute(query)
+            await session.commit()
 
     @classmethod
     async def update_admin_message_id(cls, ad_id, message_id):
-        query = (
-            update(cls)
-            .where(cls.pk == ad_id)
-            .values(admin_message_id=message_id)
-            .execution_options(synchronize_session="fetch")
-        )
-        await db.execute(query)
-        await cls.commit()
+        async for session in db.get_session():
+            query = (
+                update(cls)
+                .where(cls.pk == ad_id)
+                .values(admin_message_id=message_id)
+                .execution_options(synchronize_session="fetch")
+            )
+            await session.execute(query)
+            await session.commit()
 
     @classmethod
     async def delete(cls, ad_id):
-        query = delete(cls).where(cls.pk == ad_id)
-        await db.execute(query)
-        await cls.commit()
-        return True 
+        async for session in db.get_session():
+            query = delete(cls).where(cls.pk == ad_id)
+            await session.execute(query)
+            await session.commit()
+        return True
