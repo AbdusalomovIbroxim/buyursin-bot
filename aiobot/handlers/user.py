@@ -33,7 +33,7 @@ async def cmd_start(message: Message, state: FSMContext):
 @router.message(Command("lang"))
 async def change_lang(message: Message, state: FSMContext):
     await state.clear()
-    user = await Users.get(user_id=message.from_user.user_id)
+    user = await Users.get(user_id=message.from_user.id)
     logging.info(f"/lang: user_id={message.from_user.id}")
     await message.answer(
         TEXTS["lang_prompt"][user.lang if user.lang else "ru"],
