@@ -2,7 +2,6 @@ from sqlalchemy import Column, Integer, select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import declarative_base, sessionmaker
-
 from config import Config
 
 
@@ -83,7 +82,16 @@ class AsyncDatabaseSession:
         self._sessionmaker = None
 
     async def init(self):
-        self._engine = create_async_engine(Config.DB_CONFIG, echo=True, future=True)
+        self._engine = create_async_engine(
+            Config.DB_CONFIG,
+            echo=False,               # можно включить True для отладки
+            future=True,
+            pool_pre_ping=True,       # проверяет соединение перед использованием
+            pool_size=10,             # размер пула соединений
+            max_overflow=20,          # доп. соединения при пиках нагрузки
+            pool_recycle=1800,        # переподключение каждые 30 минут
+            pool_timeout=30,          # ожидание при нехватке соединений
+        )
         self._sessionmaker = sessionmaker(
             self._engine, expire_on_commit=False, class_=AsyncSession
         )
