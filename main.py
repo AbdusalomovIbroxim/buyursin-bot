@@ -48,9 +48,6 @@ dis.include_router(ad.router)
 dis.include_router(admin.router)
 
 
-division_by_zero = 1 / 0  # Тест Sentry
-
-
 async def on_startup():
     await db.init()
     # await db.drop_all()
