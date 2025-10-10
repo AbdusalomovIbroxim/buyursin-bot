@@ -12,7 +12,11 @@ import threading
 import os
 from datetime import datetime
 import sys
+import sentry_sdk
+from config import sentry_dsn
 
+
+sentry_sdk.init(dsn=sentry_dsn)
 logging.basicConfig(level=logging.INFO)
 
 load_dotenv()
@@ -44,6 +48,7 @@ dis.include_router(ad.router)
 dis.include_router(admin.router)
 
 
+division_by_zero = 1 / 0  # Тест Sentry
 
 
 async def on_startup():
