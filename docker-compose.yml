@@ -3,20 +3,24 @@ services:
   bot:
     build: .
     container_name: buyursin_bot
-    command: python main.py 
+    # ИСПРАВЛЕНО: Добавляем 15-секундную задержку перед запуском main.py.
+    # Это дает PostgreSQL время для создания базы данных.
+    command: /bin/sh -c "sleep 15 && python main.py"
     
+    # Загружаем переменные окружения для работы aiogram
     env_file:
       - .env
       
+    # Указываем, как бот должен подключаться к БД
     environment:
       DB_HOST: db 
       DB_USER: ${POSTGRES_USER}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       DB_NAME: ${POSTGRES_NAME}
       
+    # УПРОЩЕНО: Возвращаем простую зависимость
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     restart: always
 
   # 2. Сервис для PostgreSQL
@@ -25,18 +29,14 @@ services:
     container_name: buyursin_db
     env_file:
       - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_NAME}
     volumes:
-      # Сохраняем данные БД на хосте
       - postgres_data:/var/lib/postgresql/data/
     ports:
       - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"] 
-      interval: 5s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-      
+    
+    # УДАЛЕНО: Убираем healthcheck, так как он срабатывал слишком рано
       
 # Определяем том для сохранения данных БД
 volumes:
