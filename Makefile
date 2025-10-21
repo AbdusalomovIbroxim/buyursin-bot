@@ -20,7 +20,7 @@ logs:
 
 # Остановка и удаление контейнеров
 down:
-	docker compose down -v
+	docker compose down
 	
 # Запуск bash внутри контейнера бота
 shell:
