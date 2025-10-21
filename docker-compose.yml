@@ -1,5 +1,19 @@
 services:
-  # 1. Сервис для aiogram бота
+
+  # 1. Сервис для PostgreSQL
+  db:
+    image: postgres:15-alpine
+    container_name: buyursin_db
+    env_file:
+      - .env
+    volumes:
+      # Сохраняем данные БД на хосте
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+  
+  
+  # 2. Сервис для aiogram бота
   bot:
     build: .
     container_name: buyursin_bot
@@ -21,20 +35,7 @@ services:
       
     depends_on:
       - db
-    restart: always
-
-  # 2. Сервис для PostgreSQL
-  db:
-    image: postgres:15-alpine
-    container_name: buyursin_db
-    env_file:
-      - .env
-    volumes:
-      # Сохраняем данные БД на хосте
-      - postgres_data:/var/lib/postgresql/data/
-    ports:
-      - "5432:5432"
-      
+    restart: always      
       
 # Определяем том для сохранения данных БД
 volumes:
