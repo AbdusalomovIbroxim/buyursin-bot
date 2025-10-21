@@ -1,0 +1,39 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  # 1. Сервис для aiogram бота
+  bot:
+    build: .
+    # Используем команду, которая будет следить за перезапусками (например, watchfiles)
+    # Если вы хотите просто запустить: command: python main.py
+    command: python main.py 
+    
+    # Загружаем переменные окружения для работы aiogram
+    env_file:
+      - .env
+      
+    # Указываем, как бот должен подключаться к БД
+    environment:
+      # Важно: HOST должен быть именем сервиса (db)
+      DB_HOST: db 
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_DB}
+      
+    depends_on:
+      - db
+    restart: always
+
+  # 2. Сервис для PostgreSQL
+  db:
+    image: postgres:15-alpine
+    env_file:
+      - .env
+    volumes:
+      # Сохраняем данные БД на хосте
+      - postgres_data:/var/lib/postgresql/data/
+      
+# Определяем том для сохранения данных БД
+volumes:
+  postgres_data:
