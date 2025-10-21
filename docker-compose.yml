@@ -1,6 +1,25 @@
 services:
+  # 1. Сервис для aiogram бота
+  bot:
+    build: .
+    container_name: buyursin_bot
+    command: python main.py 
+    
+    env_file:
+      - .env
+      
+    environment:
+      DB_HOST: db 
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_NAME}
+      
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: always
 
-  # 1. Сервис для PostgreSQL
+  # 2. Сервис для PostgreSQL
   db:
     image: postgres:15-alpine
     container_name: buyursin_db
@@ -11,31 +30,13 @@ services:
       - postgres_data:/var/lib/postgresql/data/
     ports:
       - "5432:5432"
-  
-  
-  # 2. Сервис для aiogram бота
-  bot:
-    build: .
-    container_name: buyursin_bot
-    # Используем команду, которая будет следить за перезапусками (например, watchfiles)
-    # Если вы хотите просто запустить: command: python main.py
-    command: python main.py 
-    
-    # Загружаем переменные окружения для работы aiogram
-    env_file:
-      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"] 
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
       
-    # Указываем, как бот должен подключаться к БД
-    environment:
-      # Важно: HOST должен быть именем сервиса (db)
-      DB_HOST: db 
-      DB_USER: ${POSTGRES_USER}
-      DB_PASSWORD: ${POSTGRES_PASSWORD}
-      DB_NAME: ${POSTGRES_NAME}
-      
-    depends_on:
-      - db
-    restart: always      
       
 # Определяем том для сохранения данных БД
 volumes:
